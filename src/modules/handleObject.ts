@@ -4,7 +4,7 @@ import { handleArray } from './handleArray'
 
 const handleObjectResponse = () => {}
 
-export const handleObject = (json: Record<string, any>): { type: string; result: string } | void => {
+export const handleObject = (json: Record<string, any>): { type: string; result: any } | void => {
 	const keys = Object.keys(json)
 	const result: Record<string, any> = {}
 	if (keys.length === 0) {
@@ -25,5 +25,5 @@ export const handleObject = (json: Record<string, any>): { type: string; result:
 			result[key] = typeof value
 		}
 	}
-	return { type: Enum_Object_Result_Type.object, result: JSON.stringify(result, null, 4) }
+	return { type: Enum_Object_Result_Type.object, result }
 }

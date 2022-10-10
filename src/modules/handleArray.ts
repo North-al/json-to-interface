@@ -49,7 +49,7 @@ export const handleArray = (json: Array<any>): { type: string; result: string } 
 
 		// 处理Object
 		else if (isObject(current)) {
-			result[i] = handleObject(current)!.result
+			result[i] = JSON.stringify(handleObject(current)!.result)
 		} else {
 			// 基本类型处理
 			result[i] = typeof current

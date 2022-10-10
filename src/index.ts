@@ -20,12 +20,11 @@ export const jsonToInterface = (json: any, interfaceName = 'IRoot'): string => {
 
 	if (isObject(json)) {
 		const { type, result } = handleObject(json)!
-		const c = JSON.parse(result)
 
 		switch (type) {
 			case Enum_Object_Result_Type.void:
 			case Enum_Object_Result_Type.object:
-				dataType = `interface ${interfaceName} ${result}`
+				dataType = `interface ${interfaceName} ${JSON.stringify(result, null, 4)}`
 				break
 		}
 	}
