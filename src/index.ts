@@ -104,6 +104,8 @@ console.log(
 	)
 )
 
+console.log(jsonToInterface([null, undefined], '处理null和undefined'))
+
 const v: [Array<Array<number>>, Array<[Array<number>, Array<string>]>] = [[[1], [2]], [[[4], ['22']]]]
 
 console.log(jsonToInterface(v, '多维数组嵌套'))
@@ -112,4 +114,4 @@ console.log(jsonToInterface([1, 2, '3', [1, 2, '2']], '基本不同类型 + 二�
 console.log('-------------------------------------')
 
 const vv = [1, [123, [1, [2, '3']]]]
-console.log(jsonToInterface(vv, 'TTTTT').replaceAll('\\', '').replaceAll('"', ''))
+console.log(jsonToInterface(vv, 'TTTTT'))
