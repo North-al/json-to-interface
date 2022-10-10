@@ -66,6 +66,8 @@ export const handleArray = (
 			const interfaceName = randomString(5)
 			result[i] = `I${interfaceName}`
 
+			// console.log({ generateInterface})
+
 			generateInterface += `interface I${interfaceName} ${JSON.stringify(
 				handleObject(current)!.result,
 				null,
