@@ -11,3 +11,17 @@ export const isObject = (v: unknown) => {
 export const excludeSymbol = (str: string) => {
 	return str.replaceAll('\\', '').replaceAll('"', '').replaceAll(',', ', ')
 }
+
+// 首字母大写
+export const firstUpperCase = (str: string) => {
+	return str.replace(/^\S/, s => s.toUpperCase())
+}
+
+// 随机生成首字母大写、其它字母小写的随机字符串
+export const randomString = (len: number) => {
+	let str = ''
+	for (let i = 0; i < len; i++) {
+		str += String.fromCharCode(Math.floor(Math.random() * 26) + 97)
+	}
+	return firstUpperCase(str)
+}
