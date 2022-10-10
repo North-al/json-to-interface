@@ -8,7 +8,7 @@ export const handleObject = (json: Record<string, any>): { type: string; result:
 	const keys = Object.keys(json)
 	const result: Record<string, any> = {}
 	if (keys.length === 0) {
-		return { type: Enum_Object_Result_Type.void, result: '{}' }
+		return { type: Enum_Object_Result_Type.void, result: 'void' }
 	}
 
 	for (const [key, value] of Object.entries(json)) {
