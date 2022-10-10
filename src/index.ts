@@ -1,5 +1,5 @@
+import { excludeSymbol, getModelType, isArray, isObject } from './utils'
 import { Enum_Array_Result_Type } from './enum/type'
-import { isArray, isObject } from './utils/is'
 
 const handleArray = (json: Array<any>): { type: string; result: string } | void => {
 	// 如果长为0直接 返回 Array<void>
@@ -7,32 +7,29 @@ const handleArray = (json: Array<any>): { type: string; result: string } | void 
 		return { type: Enum_Array_Result_Type.void, result: 'Array<void>' }
 	}
 
-	// TODO: 暂时处理基本类型
 	const result = []
 	for (let i = 0; i < json.length; i++) {
 		const current = json[i]
-
-		// 递归处理
-		if (isArray(current)) {
+		if (current === null) {
+			result[i] = 'null'
+		} else if (isArray(current)) {
+			// 递归处理
 			result[i] = handleArray(current)!.result
-			break
 		}
 
 		// TODO：暂时不处理Object
-		if (isObject(current)) {
+		else if (isObject(current)) {
 			console.log('object')
-			break
+		} else {
+			// 基本类型处理
+			result[i] = typeof current
 		}
-
-		// 基本类型处理
-		result[i] = typeof current
 	}
 
-	/* 处理返回的数据格式
-       如果是 [number, number] 直接优化成 => Array<number>
-       如果是 [number, string, ...] 直接返回本身
-    */
-	// TODO: 待抽离、处理len = 2
+	return handleArrayResponse(result)
+}
+
+const handleArrayResponse = (result: Array<string>) => {
 	const resultLen = result.length
 
 	if (resultLen === 1) {
@@ -41,6 +38,7 @@ const handleArray = (json: Array<any>): { type: string; result: string } | void 
 
 	if (resultLen === 2) {
 		const [_1, _2] = result
+
 		return _1 === _2
 			? { type: Enum_Array_Result_Type.array_generics, result: `Array<${_1}>` }
 			: { type: Enum_Array_Result_Type.array, result: JSON.stringify(result) }
@@ -60,9 +58,7 @@ const handleArray = (json: Array<any>): { type: string; result: string } | void 
 	}
 }
 
-const handleArrayResponse = () => {}
-
-export const jsonToInterface = (json: any, interfaceName = 'IRoot') => {
+export const jsonToInterface = (json: any, interfaceName = 'IRoot'): string => {
 	let dataType: any = null
 
 	if (isArray(json)) {
@@ -70,13 +66,13 @@ export const jsonToInterface = (json: any, interfaceName = 'IRoot') => {
 
 		switch (type) {
 			case Enum_Array_Result_Type.void:
-				dataType = `type ${interfaceName} = ${result}`
+				dataType = excludeSymbol(`type ${interfaceName} = ${result}`)
 				break
 			case Enum_Array_Result_Type.array_generics:
-				dataType = `type ${interfaceName} = ${result}`
+				dataType = excludeSymbol(`type ${interfaceName} = ${result}`)
 				break
 			case Enum_Array_Result_Type.array:
-				dataType = `type ${interfaceName} = ${result}`
+				dataType = excludeSymbol(`type ${interfaceName} = ${result}`)
 				break
 			default:
 				break
@@ -104,7 +100,16 @@ console.log(
 			[1, 2],
 			[1, 2, '3']
 		],
-		'二维数组 + 不同类型 -- bug'
+		'二维数组 + 不同类型'
 	)
 )
+
+const v: [Array<Array<number>>, Array<[Array<number>, Array<string>]>] = [[[1], [2]], [[[4], ['22']]]]
+
+console.log(jsonToInterface(v, '多维数组嵌套'))
 console.log(jsonToInterface([1, 2, '3', [1, 2, '2']], '基本不同类型 + 二维数组不同类型'))
+
+console.log('-------------------------------------')
+
+const vv = [1, [123, [1, [2, '3']]]]
+console.log(jsonToInterface(vv, 'TTTTT').replaceAll('\\', '').replaceAll('"', ''))
