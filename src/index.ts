@@ -98,7 +98,7 @@ console.log(
 	jsonToInterface(
 		[
 			[1, 2],
-			[1, 2, '3']
+			[1, 2, '3', null]
 		],
 		'二维数组 + 不同类型'
 	)
