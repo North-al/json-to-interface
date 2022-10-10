@@ -66,11 +66,7 @@ export const jsonToInterface = (json: any, interfaceName = 'IRoot'): string => {
 
 		switch (type) {
 			case Enum_Array_Result_Type.void:
-				dataType = excludeSymbol(`type ${interfaceName} = ${result}`)
-				break
 			case Enum_Array_Result_Type.array_generics:
-				dataType = excludeSymbol(`type ${interfaceName} = ${result}`)
-				break
 			case Enum_Array_Result_Type.array:
 				dataType = excludeSymbol(`type ${interfaceName} = ${result}`)
 				break
