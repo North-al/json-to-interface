@@ -2,11 +2,11 @@ import { firstUpperCase, isArray, isObject, randomString } from '../utils'
 import { Enum_Array_Result_Type } from '../enum/type'
 import { handleObject } from './handleObject'
 
-let generateInterface = ``
+const generateInterface: Array<string> = []
 
-const handleArrayResponse = (
-	result: Array<string>
-): { type: string; result: any; generateInterface?: string } | void => {
+type IHandleArrayResponse = { type: string; result: any; generateInterface?: Array<string> } | void
+
+const handleArrayResponse = (result: Array<string>): IHandleArrayResponse => {
 	const resultLen = result.length
 
 	if (resultLen === 1) {
@@ -21,8 +21,16 @@ const handleArrayResponse = (
 		const [_1, _2] = result
 
 		return _1 === _2
-			? { type: Enum_Array_Result_Type.array_generics, result: `Array<${_1}>`, generateInterface }
-			: { type: Enum_Array_Result_Type.array, result: JSON.stringify(result), generateInterface }
+			? {
+					type: Enum_Array_Result_Type.array_generics,
+					result: `Array<${_1}>`,
+					generateInterface
+			  }
+			: {
+					type: Enum_Array_Result_Type.array,
+					result: JSON.stringify(result),
+					generateInterface
+			  }
 	}
 
 	if (resultLen > 2) {
@@ -39,13 +47,15 @@ const handleArrayResponse = (
 		}
 
 		// 可优化返回值
-		return { type: Enum_Array_Result_Type.array_generics, result: `Array<${_0}>`, generateInterface }
+		return {
+			type: Enum_Array_Result_Type.array_generics,
+			result: `Array<${_0}>`,
+			generateInterface
+		}
 	}
 }
 
-export const handleArray = (
-	json: Array<any>
-): { type: string; result: string; generateInterface?: string } | void => {
+export const handleArray = (json: Array<any>, key?: string): IHandleArrayResponse => {
 	// 如果长为0直接 返回 Array<void>
 	if (json.length === 0) {
 		return { type: Enum_Array_Result_Type.void, result: 'Array<void>' }
@@ -63,16 +73,24 @@ export const handleArray = (
 
 		// 处理Object
 		else if (isObject(current)) {
-			const interfaceName = randomString(5)
-			result[i] = `I${interfaceName}`
+			console.log({ current })
 
-			// console.log({ generateInterface})
+			// 获取转换后的类型
+			const { result: r } = handleObject(current)!
 
-			generateInterface += `interface I${interfaceName} ${JSON.stringify(
-				handleObject(current)!.result,
-				null,
-				4
-			)}\n`
+			// 转换成字符串
+			const typeFormatStr = JSON.stringify(r, null, 4)
+
+			/// 如果不包含，就添加进去
+			if (!generateInterface.includes(typeFormatStr)) {
+				const interfaceName = `IGenerate${generateInterface.length}`
+				generateInterface.push(typeFormatStr)
+				result[i] = interfaceName
+			} else {
+				// 如果包含、则直接获取interfaceName
+				const index = generateInterface.indexOf(typeFormatStr)
+				result[i] = `IGenerate${index}`
+			}
 		} else {
 			// 基本类型处理
 			result[i] = typeof current

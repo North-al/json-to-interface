@@ -2,13 +2,11 @@ import { firstUpperCase, isArray, isObject } from '../utils'
 import { Enum_Object_Result_Type } from '../enum/type'
 import { handleArray } from './handleArray'
 
-const handleObjectResponse = () => {}
+let generateInterface: Array<string> = []
 
-let generateInterface = ``
+type HandleObjectResponse = { type: string; result: any; generateInterface?: Array<string> } | void
 
-export const handleObject = (
-	json: Record<string, any>
-): { type: string; result: any; generateInterface?: string } | void => {
+export const handleObject = (json: Record<string, any>): HandleObjectResponse => {
 	const keys = Object.keys(json)
 
 	const result: Record<string, any> = {}
@@ -22,13 +20,14 @@ export const handleObject = (
 			result[key] = 'null'
 		} else if (isArray(value)) {
 			// 递归处理
-			result[key] = handleArray(value)!.result
-			generateInterface += handleArray(value)!.generateInterface
+			const { result: r, generateInterface: g } = handleArray(value)!
+			result[key] = r
+			generateInterface.push(...g!)
 		} else if (isObject(value)) {
 			// 递归处理
-			const { result: r } = handleObject(value)!
-
-			generateInterface += `interface I${firstUpperCase(key)} ${JSON.stringify(r, null, 4)}\n`
+			generateInterface.push(
+				`interface I${firstUpperCase(key)} ${JSON.stringify(handleObject(value)!.result, null, 4)}`
+			)
 			result[key] = `I${firstUpperCase(key)}`
 		} else {
 			// 基本类型处理
